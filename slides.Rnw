@@ -1,0 +1,108 @@
+\documentclass{beamer}
+
+\begin{document}
+
+\title{Data wrangling and Wordcloud}
+\author{Akhilesh Atluri}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Outline}
+    \tableofcontents
+\end{frame}
+
+\section{Install and Load Libraries}
+\begin{frame}[fragile]
+  \frametitle{Install and Load Libraries}
+    \begin{itemize}
+      \item<1->
+        <<warning=FALSE,message=FALSE>>=
+        library(dplyr)
+        @
+      \item<2->
+        <<warning=FALSE,message=FALSE>>=
+        library(tidytext)
+        @
+    \item<3->
+        <<warning=FALSE,message=FALSE>>=
+        library(gutenbergr)
+        @
+    \item<4->
+        <<warning=FALSE,message=FALSE>>=
+        library(ggplot2)
+        @
+    \item<5->
+        <<warning=FALSE,message=FALSE>>=
+        library(stringr)
+        @
+    \item<6->
+       <<warning = FALSE,message = FALSE>>=
+        library(wordcloud)
+        @
+    \end{itemize}
+\end{frame}
+
+\section{Getting the data from Gutenbergr}
+
+\begin{frame}[fragile] 
+
+  \frametitle{Getting the data from Gutenbergr}
+    <<>>=
+    
+gutenberg_works(str_detect(title,'The Adventure'))
+
+sherlock<-gutenberg_download(1661)
+    @
+\end{frame}
+
+
+\section{Getting the words}
+
+\begin{frame}[fragile] 
+
+  \frametitle{Getting the words}
+    <<>>=
+    
+sherlock_words<-sherlock%>%
+  unnest_tokens(word,text)
+sherlock_words
+    @
+\end{frame}
+
+\section{Getting rid of unwanted words}
+
+\begin{frame}[fragile] 
+
+  \frametitle{Getting rid of unwanted words}
+    <<>>=
+    
+sherlock_words<-sherlock_words%>%
+  filter(!(word %in% stop_words$word))
+    @
+\end{frame}
+
+\section{grouping each word and getiing the count of each word}
+
+\begin{frame}[fragile] 
+
+  \frametitle{grouping each word and getiing the count of each word}
+    <<>>=
+sherlock_freq<-sherlock_words%>%
+  group_by(word)%>%
+  summarize(count=n())
+    @
+\end{frame}
+
+\section{displaying the words on wordlcoud}
+
+\begin{frame}[fragile] 
+
+  \frametitle{displaying the words on wordcloud}
+    <<>>=
+wordcloud(sherlock_freq$word,sherlock_freq$count,min.freq = 25)
+    @
+\end{frame}
+\end{document}
